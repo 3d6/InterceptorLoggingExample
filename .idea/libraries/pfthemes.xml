@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="pfthemes">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/afterdark-1.0.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/start-1.0.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
