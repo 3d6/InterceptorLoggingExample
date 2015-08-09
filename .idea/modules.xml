@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PFTest.iml" filepath="$PROJECT_DIR$/PFTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/InterceptorLoggingExample.iml" filepath="$PROJECT_DIR$/InterceptorLoggingExample.iml" />
     </modules>
   </component>
 </project>
