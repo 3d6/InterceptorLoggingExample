@@ -1,4 +1,4 @@
-package de.nocnoc.example.ee.logging.impl.view;
+package de.nocnoc.example.ee.logging.impl.logging;
 
 /*
  This file is part of InterceptorLoggingExample.
@@ -32,50 +32,33 @@ package de.nocnoc.example.ee.logging.impl.view;
  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  */
 
-import de.nocnoc.example.ee.logging.impl.controller.DateMessageUtils;
-import de.nocnoc.example.ee.logging.impl.logging.HasLogger;
-import de.nocnoc.example.ee.logging.impl.logging.TraceLogger;
-import de.nocnoc.example.ee.logging.impl.logging.TraceLogging;
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
-import java.util.Date;
-import java.util.logging.Logger;
+/**
+ * This  qualifier is used to get an entry/exit method logger.
+ * This logger is primarily used to simplify basic method logging.
+ */
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface TraceLogger {
 
-import static de.nocnoc.example.ee.logging.impl.logging.LogLevel.FINER;
+    /**
+     * Log level of the logger
+     *
+     * @return the logLevel (as enum)
+     */
+    @Nonbinding LogLevel value() default LogLevel.FINER;
 
-@ManagedBean
-public class CalendarView implements HasLogger {
-
-    @Inject
-    @TraceLogger(value = FINER, handlerLogLevel = FINER)
-    private transient Logger logger;
-
-    @Inject
-    private DateMessageUtils dateMessageUtils;
-
-    private Date date1;
-
-    @TraceLogging(FINER)
-    public void onDateSelect() {
-        String message = dateMessageUtils.getSimpleDateMessage(date1);
-
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Date Selected", message));
-    }
-
-    public Date getDate1() {
-        return date1;
-    }
-
-    public void setDate1(Date date1) {
-        this.date1 = date1;
-    }
-
-    @Override
-    public Logger getLogger() {
-        return logger;
-    }
+    /**
+     * Log level of the loggers handler
+     *
+     * @return the logLevel (as enum)
+     */
+    @Nonbinding LogLevel handlerLogLevel() default LogLevel.KEEP;
 }

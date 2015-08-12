@@ -44,10 +44,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * EntryExitLogging Interceptor for project wide easy method entry and exit logging
+ * TraceLogging Interceptor for project wide easy method entry and exit logging
  */
 @Interceptor
-@EntryExitLogging
+@TraceLogging
 @Priority(Interceptor.Priority.APPLICATION)
 @Dependent
 public class LoggingInterceptor {
@@ -55,21 +55,45 @@ public class LoggingInterceptor {
     @AroundInvoke
     public Object log(InvocationContext context) throws Exception {
 
+        // Logging is only available on classes implementing HasLogger
         if (!(context.getTarget() instanceof HasLogger)) {
-            throw new IllegalArgumentException("Logging is only available on classes implementing '" + HasLogger.class.getCanonicalName() + "'");
+            throw new IllegalArgumentException("Logging is only available on classes implementing '" + HasLogger.class.getCanonicalName() + "'!");
+        }
+
+        // don't log anything if the invocation context is not the method, but the class
+        Method method = context.getMethod();
+        if (method == null) {
+            return context.proceed();
+        }
+
+        // exception: don't log getting the logger
+        if (method.equals(HasLogger.class.getMethod("getLogger"))) {
+            return context.proceed();
+        }
+
+        TraceLogging annotation;
+
+        if (method.isAnnotationPresent(TraceLogging.class)) {
+            // get the logging level from the methods annotation
+            annotation = method.getAnnotation(TraceLogging.class);
+        } else if (context.getTarget().getClass().isAnnotationPresent(TraceLogging.class)) {
+            // if the annotation is not at the method but the class, get it from there
+            annotation = context.getTarget().getClass().getAnnotation(TraceLogging.class);
+        } else {
+            // if there is no annotation there is something wrong
+            throw new IllegalArgumentException("No valid context found!");
         }
 
         // get the logger from the calling class
         Logger logger = ((HasLogger) context.getTarget()).getLogger();
 
-        // get the logging level
-        Method method = context.getMethod();
-        EntryExitLogging annotation = method.getAnnotation(EntryExitLogging.class);
+
         Level level = annotation.value().getLevel();
 
         boolean isLoggable = logger.isLoggable(level);
 
-        boolean resolveArray = false;
+        boolean resolveArray = annotation.resolveArray();
+
         String parameter = "";
 
         if (isLoggable) {

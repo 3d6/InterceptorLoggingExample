@@ -82,15 +82,15 @@ public class LoggerProducer {
     }
 
     @Produces
-    @EntryExitLogger
+    @TraceLogger
     public Logger produceEntryExitMethodLogger(InjectionPoint injectionPoint) {
         Logger logger = Logger.getLogger(injectionPoint.getMember().getDeclaringClass().getCanonicalName());
 
         // get the log level for the logger
-        LogLevel loggerLevel = injectionPoint.getAnnotated().getAnnotation(EntryExitLogger.class).value();
+        LogLevel loggerLevel = injectionPoint.getAnnotated().getAnnotation(TraceLogger.class).value();
 
         // get the log level for the loggers handler
-        LogLevel handlerLevel = injectionPoint.getAnnotated().getAnnotation(EntryExitLogger.class).handlerLogLevel();
+        LogLevel handlerLevel = injectionPoint.getAnnotated().getAnnotation(TraceLogger.class).handlerLogLevel();
 
         if (!LogLevel.KEEP.equals(handlerLevel) && logger.getUseParentHandlers()) {
             Handler[] handlers = getHandlers(logger);

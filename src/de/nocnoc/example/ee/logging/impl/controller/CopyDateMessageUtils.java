@@ -1,4 +1,4 @@
-package de.nocnoc.example.ee.logging.impl.logging;
+package de.nocnoc.example.ee.logging.impl.controller;
 
 /*
  This file is part of InterceptorLoggingExample.
@@ -32,27 +32,55 @@ package de.nocnoc.example.ee.logging.impl.logging;
  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  */
 
-import javax.enterprise.util.Nonbinding;
-import javax.interceptor.InterceptorBinding;
-import java.lang.annotation.*;
+import de.nocnoc.example.ee.logging.impl.logging.HasLogger;
+import de.nocnoc.example.ee.logging.impl.logging.TraceLogger;
+import de.nocnoc.example.ee.logging.impl.logging.TraceLogging;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.logging.Logger;
+
+import static de.nocnoc.example.ee.logging.impl.logging.LogLevel.FINER;
 
 /**
- * EntryExitLogging automaticly logs entering and exiting a method.
- * If you want to use this annotation, your class hass to implement
- * the <code>HasLogger</code> interface to provide its own logger.
+ * Managing String Formats for Dates
  */
+@ApplicationScoped
+@TraceLogging(FINER)
+public class CopyDateMessageUtils implements HasLogger {
 
-@Inherited
-@InterceptorBinding
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface EntryExitLogging {
+    @Inject
+    @TraceLogger(value = FINER, handlerLogLevel = FINER)
+    private transient Logger logger;
 
-    @Nonbinding LogLevel value() default LogLevel.FINER;
 
-    @Nonbinding boolean resolveArray() default true;
+    public String getSimpleDateMessage(Date date) {
 
-    @Nonbinding String entryIndicator() default ">>";
+        date.setTime(date.getTime() + 12345);
 
-    @Nonbinding String exitIndicator() default "<<";
+        ZonedDateTime zdt = date.toInstant().atZone(ZoneId.systemDefault());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        String result = formatter.format(zdt);
+
+        noReturn(result);
+
+        return result;
+    }
+
+    @TraceLogging(FINER)
+    public void noReturn(Object object) {
+
+    }
+
+    @Override
+    public Logger getLogger() {
+        return this.logger;
+    }
+
 }

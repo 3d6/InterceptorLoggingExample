@@ -33,32 +33,26 @@ package de.nocnoc.example.ee.logging.impl.logging;
  */
 
 import javax.enterprise.util.Nonbinding;
-import javax.inject.Qualifier;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.interceptor.InterceptorBinding;
+import java.lang.annotation.*;
 
 /**
- * This  qualifier is used to get an entry/exit method logger.
- * This logger is primarily used to simplify basic method logging.
+ * TraceLogging automaticly logs entering and exiting a method.
+ * If you want to use this annotation, your class hass to implement
+ * the <code>HasLogger</code> interface to provide its own logger.
  */
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface EntryExitLogger {
 
-    /**
-     * Log level of the logger
-     *
-     * @return the logLevel (as enum)
-     */
+@Inherited
+@InterceptorBinding
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface TraceLogging {
+
     @Nonbinding LogLevel value() default LogLevel.FINER;
 
-    /**
-     * Log level of the loggers handler
-     *
-     * @return the logLevel (as enum)
-     */
-    @Nonbinding LogLevel handlerLogLevel() default LogLevel.KEEP;
+    @Nonbinding boolean resolveArray() default true;
+
+    @Nonbinding String entryIndicator() default ">>";
+
+    @Nonbinding String exitIndicator() default "<<";
 }

@@ -32,47 +32,37 @@ package de.nocnoc.example.ee.logging.impl.controller;
  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  */
 
-import de.nocnoc.example.ee.logging.impl.logging.EntryExitLogger;
-import de.nocnoc.example.ee.logging.impl.logging.EntryExitLogging;
 import de.nocnoc.example.ee.logging.impl.logging.HasLogger;
+import de.nocnoc.example.ee.logging.impl.logging.TraceLogger;
+import de.nocnoc.example.ee.logging.impl.logging.TraceLogging;
 
-import javax.faces.bean.ApplicationScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.logging.Logger;
 
 import static de.nocnoc.example.ee.logging.impl.logging.LogLevel.FINER;
-import static de.nocnoc.example.ee.logging.impl.logging.LogLevel.WARNING;
 
 /**
  * Managing String Formats for Dates
  */
 @ApplicationScoped
+@TraceLogging(FINER)
 public class DateMessageUtils implements HasLogger {
 
     @Inject
-    @EntryExitLogger(value = FINER, handlerLogLevel = FINER)
+    @TraceLogger(value = FINER, handlerLogLevel = FINER)
     private transient Logger logger;
 
-    @EntryExitLogging(FINER)
+    @Inject
+    private CopyDateMessageUtils dateMessageUtils;
+
+
     public String getSimpleDateMessage(Date date) {
 
-        date.setTime(date.getTime() + 12345);
-
-        ZonedDateTime zdt = date.toInstant().atZone(ZoneId.systemDefault());
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        return formatter.format(zdt);
+        return dateMessageUtils.getSimpleDateMessage(date);
     }
 
-    @EntryExitLogging(WARNING)
-    public void noReturn(Object object) {
-
-    }
 
     @Override
     public Logger getLogger() {
